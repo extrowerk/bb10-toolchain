@@ -9,6 +9,6 @@ As a workaround you can do the following:
 
 1) open a Terminal
 2) sudo mkdir -p /opt/qnx800/target/qnx6/usr/
-3) sudo chown -R `whoami`:`whoami` /opt/qnx800
+3) sudo chown -R \`whoami\`:\`whoami\` /opt/qnx800
 
 Have fun!
