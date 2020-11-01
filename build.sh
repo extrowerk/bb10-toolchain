@@ -4,7 +4,7 @@
 
 # You probably want to change this:
 
-HOST_CC=$HOST_CC
+HOST_CC=gcc
 CPU_COUNT=4
 
 #----------------------------------------
