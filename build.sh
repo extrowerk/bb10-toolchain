@@ -154,7 +154,6 @@ LDFLAGS='-Wl,-s '
     --disable-libssp \
     --disable-libstdcxx-pch \
     --enable-libmudflap \
-    --enable-libgomp \
     --enable-__cxa_atexit \
     --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/8.3.0" \
     --disable-shared \
@@ -203,7 +202,6 @@ cd bb10-gcc-build
     --disable-libssp \
     --disable-libstdcxx-pch \
     --enable-libmudflap \
-    --enable-libgomp \
     --enable-__cxa_atexit \
     --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/8.3.0" \
     --enable-shared \
