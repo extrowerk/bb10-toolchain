@@ -4,12 +4,13 @@
 
 # You probably want to change this:
 
-HOST_CC="gcc"
+HOST_CC="gcc" # default: gcc
 CPU_COUNT="4"
-TARGET_FOLDER="/opt/qnx800/target"
-HOST_FOLDER="/opt/qnx800/host"
-HOST_OS="i686-pc-linux-gnu"
-TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi"
+OUTPUT_FOLDER="/opt/qnx800" # default: /opt/qnx800
+TARGET_FOLDER="$OUTPUT_FOLDER/target" # default: /opt/qnx800/target
+HOST_FOLDER="$OUTPUT_FOLDER/host" # default: /opt/qnx800/host
+HOST_OS="i686-pc-linux-gnu" # default: i686-pc-linux-gnu
+TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi" # default arm-unknown-nto-qnx8.0.0eabi
 
 #----------------------------------------
 
@@ -88,7 +89,7 @@ LDFLAGS='-Wl,-s '
     LDFLAGS="-Wl,-s " \
     AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
 
-make -j $CPU_COUNT
+make -j "$CPU_COUNT"
 make install
 cd ..
 
@@ -135,7 +136,7 @@ cd bb10-libgmp-build
     LDFLAGS="-Wl,-s " \
     AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
 
-make -j $CPU_COUNT
+make -j "$CPU_COUNT"
 make install
 cd ..
 
@@ -160,7 +161,7 @@ cd bb10-libmpc-build
     LDFLAGS="-Wl,-s " \
     AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
 
-make -j $CPU_COUNT
+make -j "$CPU_COUNT"
 make install
 cd ..
 
