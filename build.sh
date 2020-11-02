@@ -6,7 +6,7 @@
 
 export HOST_CC="gcc" # default: gcc
 export CPU_COUNT="4"
-export HOST_KERNEL=`uname -s`
+export HOST_KERNEL="linux"
 export HOST_PLATFORM=`uname -i`
 export HOST_MACHINE=`uname -m`
 export OUTPUT_FOLDER="/opt/qnx800" # default: /opt/qnx800
