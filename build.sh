@@ -15,6 +15,7 @@ export HOST_FOLDER="$OUTPUT_FOLDER/host" # default: /opt/qnx800/host
 export TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi" # default arm-unknown-nto-qnx8.0.0eabi
 export HOST_OS="$HOST_MACHINE-$HOST_PLATFORM-$HOST_KERNEL-gnu" # default: i686-pc-linux-gnu
 export PREFIX="$HOST_FOLDER/$HOST_KERNEL/$HOST_MACHINE/usr"
+export BUGURL="https://github.com/extrowerk/bb10-toolchain"
 
 # ----------------------------------------
 
@@ -158,7 +159,7 @@ LDFLAGS='-Wl,-s '
     --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/8.3.0" \
     --disable-shared \
     --enable-multilib \
-    --with-bugurl="http://www.qnx.com" \
+    --with-bugurl="$BUGURL" \
     --enable-gnu-indirect-function \
     --enable-stack-protector \
     --with-float=softfp \
