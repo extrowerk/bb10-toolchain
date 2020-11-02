@@ -4,8 +4,11 @@ Work in progress!
 
 You will need the lates BB NDK:
 https://developer.blackberry.com/native/downloads/
+Install it in the default folder (eg. ~/bbndk)
 
-And the build-essentials (gcc, flex, texinfo, etc...) package for your OS. Use your package manager-
+And the build-essentials package for your OS. Use your package manager.
+You will also need : mpfr, mpc, libgomp, flex, texinfo, autotools, autoconf, autoconf-archive and the respective devel packages.
+Tar will be also required.
 
 /-/
 

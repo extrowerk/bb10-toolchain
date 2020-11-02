@@ -6,13 +6,16 @@
 
 export HOST_CC="gcc" # default: gcc
 export CPU_COUNT="4"
-export HOST_KERNEL=`uname -s | tr '[:upper:]' '[:lower:]'` # should be lowercase
+
+# ----------------------------------------
+
+export HOST_KERNEL=`uname -s | tr '[:upper:]' '[:lower:]'` # should be lowercase, default: linux
 export HOST_PLATFORM=`uname -i`
 export HOST_MACHINE=`uname -m`
 export OUTPUT_FOLDER="/opt/qnx800" # default: /opt/qnx800
 export TARGET_FOLDER="$OUTPUT_FOLDER/target" # default: /opt/qnx800/target
 export HOST_FOLDER="$OUTPUT_FOLDER/host" # default: /opt/qnx800/host
-export TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi" # default arm-unknown-nto-qnx8.0.0eabi
+export TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi" # default: arm-unknown-nto-qnx8.0.0eabi
 export HOST_OS="$HOST_MACHINE-$HOST_PLATFORM-$HOST_KERNEL-gnu" # default: i686-pc-linux-gnu
 export PREFIX="$HOST_FOLDER/$HOST_KERNEL/$HOST_MACHINE/usr"
 export BUGURL="https://github.com/extrowerk/bb10-toolchain/"
@@ -41,13 +44,23 @@ cd BB10_tools
 
 # DOWNLOAD
 
-git clone https://github.com/extrowerk/bb10-binutils.git
+wget https://ftp.fau.de/gnu/binutils/binutils-2.35.tar.xz # this is just the vanilla binutils
+tar -xvf binutils-2.35.tar.xz
+mv binutils-2.35 bb10-binutils
 
+# git clone https://github.com/extrowerk/bb10-binutils.git
 git clone https://github.com/extrowerk/bb10-gcc.git
 git clone https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
 git clone https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
 git clone https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
+
 # ----------------------------------------
+
+# RECONFIGURE MPFR
+
+cd bb10-gcc/mpfr
+autoreconf -f -i # make sure you have autoconf-archive installed!
+cd ../..
 
 # ----------------------------------------
 
@@ -56,18 +69,9 @@ git clone https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
 mkdir -p bb10-binutils-build
 cd bb10-binutils-build
 
-ac_cv_func_ftello64=no
-ac_cv_func_fseeko64=no
-ac_cv_func_fopen64=no
-CFLAGS='$CFLAGS -Wno-shadow -Wno-format -Wno-sign-compare';
-LDFLAGS='-Wl,-s '
-
 ../bb10-binutils/configure \
     --srcdir=../bb10-binutils \
     --build="$HOST_OS" \
-    --enable-cheaders=c \
-    --with-as="$TARGET_ABI"-as \
-    --with-ld="$TARGET_ABI"-ld \
     --with-sysroot="$TARGET_FOLDER/qnx6/" \
     --disable-werror \
     --libdir="$PREFIX/lib" \
@@ -76,25 +80,6 @@ LDFLAGS='-Wl,-s '
     --prefix="$PREFIX" \
     --exec-prefix="$PREFIX" \
     --with-local-prefix="$PREFIX" \
-    --enable-languages=c++ \
-    --enable-threads=posix \
-    --disable-nls \
-    --disable-tls \
-    --disable-libssp \
-    --disable-libstdcxx-pch \
-    --enable-libmudflap \
-    --enable-__cxa_atexit \
-    --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/8.3.0" \
-    --disable-shared \
-    --enable-multilib \
-    --with-bugurl="$BUGURL" \
-    --enable-gnu-indirect-function \
-    --enable-stack-protector \
-    --with-float=softfp \
-    --with-arch=armv7-a \
-    --with-fpu=vfpv3-d16 \
-    --with-mode=thumb \
-    --disable-initfini-array \
     CC="$HOST_CC" \
     LDFLAGS="-Wl,-s " \
     AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
@@ -109,6 +94,14 @@ cd ..
 
 mkdir -p bb10-gcc-build
 cd bb10-gcc-build
+
+export CFLAGS="" # maybe unneeded
+export CFLAGS_FOR_BUILD="" # maybe unneeded
+export CFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
+export CXXFLAGS="" # maybe unneeded
+export CXXFLAGS_FOR_BUILD="" # maybe unneeded
+export CXXFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
+
 
 ../bb10-gcc/configure \
     --srcdir=../bb10-gcc \
@@ -145,8 +138,8 @@ cd bb10-gcc-build
     CC="$HOST_CC" \
     LDFLAGS="-Wl,-s " \
     AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
-
-make -j "$CPU_COUNT"
-make install
-cd ..
-
+ 
+make all-gcc -j "$CPU_COUNT"
+make all-target-libgcc -j "$CPU_COUNT"
+make install-gcc
+make install-target-libgcc
