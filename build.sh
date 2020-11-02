@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# PERSONALIZATON
+# PERSONALIZATON :
 
 # You probably want to change this:
 
@@ -8,6 +8,8 @@ export HOST_CC="gcc" # default: gcc
 export CPU_COUNT="4"
 
 # ----------------------------------------
+
+# GLOBAL EXPORTS :
 
 export HOST_KERNEL=`uname -s | tr '[:upper:]' '[:lower:]'` # should be lowercase, default: linux
 export HOST_PLATFORM=`uname -i`
@@ -23,6 +25,7 @@ export BUGURL="https://github.com/extrowerk/bb10-toolchain/"
 # ----------------------------------------
 
 # ENVIRONMENT :
+
 source ~/bbndk/bbndk-env_10_3_1_995.sh
 export PATH="$PREFIX/bin:$PATH"
 export LIBDIR="$PREFIX/lib:$LIBDIR"
@@ -30,7 +33,6 @@ export LIBDIR="$PREFIX/lib:$LIBDIR"
 # ----------------------------------------
 
 # PREPARATION :
-
 
 rm -rf "$OUTPUT_FOLDER"
 mkdir -p "$TARGET_FOLDER/qnx6/usr/"
@@ -42,7 +44,7 @@ cd BB10_tools
 
 # ----------------------------------------
 
-# DOWNLOAD
+# DOWNLOADS :
 
 wget https://ftp.fau.de/gnu/binutils/binutils-2.35.tar.xz # this is just the vanilla binutils
 tar -xvf binutils-2.35.tar.xz
@@ -56,7 +58,7 @@ git clone https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
 
 # ----------------------------------------
 
-# RECONFIGURE MPFR
+# RECONFIGURE MPFR :
 
 cd bb10-gcc/mpfr
 autoreconf -f -i # make sure you have autoconf-archive installed!
@@ -64,7 +66,7 @@ cd ../..
 
 # ----------------------------------------
 
-# BINUTILS:
+# BINUTILS :
 
 mkdir -p bb10-binutils-build
 cd bb10-binutils-build
@@ -90,7 +92,7 @@ cd ..
 
 # ----------------------------------------
 
-# GCC:
+# GCC :
 
 mkdir -p bb10-gcc-build
 cd bb10-gcc-build
