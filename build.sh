@@ -4,18 +4,23 @@
 
 # You probably want to change this:
 
-HOST_CC="gcc" # default: gcc
-CPU_COUNT="4"
-OUTPUT_FOLDER="/opt/qnx800" # default: /opt/qnx800
-TARGET_FOLDER="$OUTPUT_FOLDER/target" # default: /opt/qnx800/target
-HOST_FOLDER="$OUTPUT_FOLDER/host" # default: /opt/qnx800/host
-HOST_OS="i686-pc-linux-gnu" # default: i686-pc-linux-gnu
-TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi" # default arm-unknown-nto-qnx8.0.0eabi
+export HOST_CC="gcc" # default: gcc
+export CPU_COUNT="4"
+export HOST_KERNEL=`uname -s`
+export HOST_PLATFORM=`uname -i`
+export HOST_MACHINE=`uname -m`
+export OUTPUT_FOLDER="/opt/qnx800" # default: /opt/qnx800
+export TARGET_FOLDER="$OUTPUT_FOLDER/target" # default: /opt/qnx800/target
+export HOST_FOLDER="$OUTPUT_FOLDER/host" # default: /opt/qnx800/host
+export TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi" # default arm-unknown-nto-qnx8.0.0eabi
+export HOST_OS="$HOST_MACHINE-$HOST_PLATFORM-$HOST_KERNEL-gnu" # default: i686-pc-linux-gnu
+export PREFIX="$HOST_FOLDER/$HOST_KERNEL/$HOST_MACHINE/usr"
 
 #----------------------------------------
 
 # ENVIRONMENT :
 source ~/bbndk/bbndk-env_10_3_1_995.sh
+export PATH="$PREFIX/bin:$PATH"
 
 #----------------------------------------
 
@@ -40,61 +45,6 @@ git clone https://github.com/extrowerk/bb10-gcc.git
 
 #----------------------------------------
 
-# BINUTILS:
-
-mkdir -p bb10-binutils-build
-cd bb10-binutils-build
-
-ac_cv_func_ftello64=no
-ac_cv_func_fseeko64=no
-ac_cv_func_fopen64=no
-CFLAGS='$CFLAGS -Wno-shadow -Wno-format -Wno-sign-compare';
-LDFLAGS='-Wl,-s '
-
-../bb10-binutils/configure \
-    --srcdir=../bb10-binutils \
-    --build="$HOST_OS" \
-    --enable-cheaders=c \
-    --with-as="$TARGET_ABI"-as \
-    --with-ld="$TARGET_ABI"-ld \
-    --with-sysroot="$TARGET_FOLDER/qnx6/" \
-    --disable-werror \
-    --libdir="$HOST_FOLDER/linux/x86/usr/lib" \
-    --libexecdir="$HOST_FOLDER/linux/x86/usr/lib" \
-    --target="$TARGET_ABI" \
-    --prefix="$HOST_FOLDER/linux/x86/usr" \
-    --exec-prefix="$HOST_FOLDER/linux/x86/usr" \
-    --with-local-prefix="$HOST_FOLDER/linux/x86/usr" \
-    --enable-languages=c++ \
-    --enable-threads=posix \
-    --disable-nls \
-    --disable-tls \
-    --disable-libssp \
-    --disable-libstdcxx-pch \
-    --enable-libmudflap \
-    --enable-libgomp \
-    --enable-__cxa_atexit \
-    --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/8.3.0" \
-    --disable-shared \
-    --enable-multilib \
-    --with-bugurl="http://www.qnx.com" \
-    --enable-gnu-indirect-function \
-    --enable-stack-protector \
-    --with-float=softfp \
-    --with-arch=armv7-a \
-    --with-fpu=vfpv3-d16 \
-    --with-mode=thumb \
-    --disable-initfini-array \
-    CC="$HOST_CC" \
-    LDFLAGS="-Wl,-s " \
-    AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
-
-make -j "$CPU_COUNT"
-make install
-cd ..
-
-# ----------------------------------------
-
 # GMP:
 
 mkdir -p bb10-libgmp-build
@@ -108,11 +58,11 @@ cd bb10-libgmp-build
     --with-ld="$TARGET_ABI"-ld \
     --with-sysroot="$TARGET_FOLDER/qnx6/" \
     --disable-werror \
-    --libdir="$HOST_FOLDER/linux/x86/usr/lib" \
-    --libexecdir="$HOST_FOLDER/linux/x86/usr/lib" \
-    --prefix="$HOST_FOLDER/linux/x86/usr" \
-    --exec-prefix="$HOST_FOLDER/linux/x86/usr" \
-    --with-local-prefix="$HOST_FOLDER/linux/x86/usr" \
+    --libdir="$PREFIX/lib" \
+    --libexecdir="$PREFIX/lib" \
+    --prefix="$PREFIX" \
+    --exec-prefix="$PREFIX" \
+    --with-local-prefix="$PREFIX" \
     --enable-languages=c++ \
     --enable-threads=posix \
     --disable-nls \
@@ -151,11 +101,11 @@ cd bb10-libmpc-build
     --srcdir=../bb10-libmpc \
     --build="$HOST_OS" \
     --with-sysroot="$TARGET_FOLDER/qnx6/" \
-    --libdir="$HOST_FOLDER/linux/x86/usr/lib" \
-    --libexecdir="$HOST_FOLDER/linux/x86/usr/lib" \
+    --libdir="$PREFIX/lib" \
+    --libexecdir="$PREFIX/lib" \
     --target="$TARGET_ABI" \
-    --prefix="$HOST_FOLDER/linux/x86/usr" \
-    --exec-prefix="$HOST_FOLDER/linux/x86/usr" \
+    --prefix="$PREFIX" \
+    --exec-prefix="$PREFIX" \
     --enable-shared \
     CC="$HOST_CC" \
     LDFLAGS="-Wl,-s " \
@@ -176,12 +126,67 @@ cd bb10-libmpfr-build
     --srcdir=../bb10-libmpfr \
     --build="$HOST_OS" \
     --with-sysroot="$TARGET_FOLDER/qnx6/" \
-    --libdir="$HOST_FOLDER/linux/x86/usr/lib" \
-    --libexecdir="$HOST_FOLDER/linux/x86/usr/lib" \
+    --libdir="$PREFIX/lib" \
+    --libexecdir="$PREFIX/lib" \
     --target="$TARGET_ABI" \
-    --prefix="$HOST_FOLDER/linux/x86/usr" \
-    --exec-prefix="$HOST_FOLDER/linux/x86/usr" \
+    --prefix="$PREFIX" \
+    --exec-prefix="$PREFIX" \
     --enable-shared \
+    CC="$HOST_CC" \
+    LDFLAGS="-Wl,-s " \
+    AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
+
+make -j "$CPU_COUNT"
+make install
+cd ..
+
+# ----------------------------------------
+
+# BINUTILS:
+
+mkdir -p bb10-binutils-build
+cd bb10-binutils-build
+
+ac_cv_func_ftello64=no
+ac_cv_func_fseeko64=no
+ac_cv_func_fopen64=no
+CFLAGS='$CFLAGS -Wno-shadow -Wno-format -Wno-sign-compare';
+LDFLAGS='-Wl,-s '
+
+../bb10-binutils/configure \
+    --srcdir=../bb10-binutils \
+    --build="$HOST_OS" \
+    --enable-cheaders=c \
+    --with-as="$TARGET_ABI"-as \
+    --with-ld="$TARGET_ABI"-ld \
+    --with-sysroot="$TARGET_FOLDER/qnx6/" \
+    --disable-werror \
+    --libdir="$PREFIX/lib" \
+    --libexecdir="$PREFIX/lib" \
+    --target="$TARGET_ABI" \
+    --prefix="$PREFIX" \
+    --exec-prefix="$PREFIX" \
+    --with-local-prefix="$PREFIX" \
+    --enable-languages=c++ \
+    --enable-threads=posix \
+    --disable-nls \
+    --disable-tls \
+    --disable-libssp \
+    --disable-libstdcxx-pch \
+    --enable-libmudflap \
+    --enable-libgomp \
+    --enable-__cxa_atexit \
+    --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/8.3.0" \
+    --disable-shared \
+    --enable-multilib \
+    --with-bugurl="http://www.qnx.com" \
+    --enable-gnu-indirect-function \
+    --enable-stack-protector \
+    --with-float=softfp \
+    --with-arch=armv7-a \
+    --with-fpu=vfpv3-d16 \
+    --with-mode=thumb \
+    --disable-initfini-array \
     CC="$HOST_CC" \
     LDFLAGS="-Wl,-s " \
     AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
@@ -205,12 +210,12 @@ cd bb10-gcc-build
     --with-ld="$TARGET_ABI"-ld \
     --with-sysroot="$TARGET_FOLDER/qnx6/" \
     --disable-werror \
-    --libdir="$HOST_FOLDER/linux/x86/usr/lib" \
-    --libexecdir="$HOST_FOLDER/linux/x86/usr/lib" \
+    --libdir="$PREFIX/lib" \
+    --libexecdir="$PREFIX/lib" \
     --target="$TARGET_ABI" \
-    --prefix="$HOST_FOLDER/linux/x86/usr" \
-    --exec-prefix="$HOST_FOLDER/linux/x86/usr" \
-    --with-local-prefix="$HOST_FOLDER/linux/x86/usr" \
+    --prefix="$PREFIX" \
+    --exec-prefix="$PREFIX" \
+    --with-local-prefix="$PREFIX" \
     --enable-languages=c++ \
     --enable-threads=posix \
     --disable-nls \
