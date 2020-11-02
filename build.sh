@@ -42,84 +42,12 @@ cd BB10_tools
 # DOWNLOAD
 
 git clone https://github.com/extrowerk/bb10-binutils.git
-git clone https://github.com/extrowerk/bb10-libmpc.git
-git clone https://github.com/extrowerk/bb10-libgmp.git
-git clone https://github.com/extrowerk/bb10-libmpfr.git
+
 git clone https://github.com/extrowerk/bb10-gcc.git
-
+git clone https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
+git clone https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
+git clone https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
 # ----------------------------------------
-
-# GMP:
-
-mkdir -p bb10-libgmp-build
-cd bb10-libgmp-build
-
-../bb10-libgmp/configure \
-    --srcdir=../bb10-libgmp \
-    --build="$HOST_OS" \
-    --with-sysroot="$TARGET_FOLDER/qnx6/" \
-    --libdir="$PREFIX/lib" \
-    --libexecdir="$PREFIX/lib" \
-    --prefix="$PREFIX" \
-    --exec-prefix="$PREFIX" \
-    --enable-shared \
-    CC="$HOST_CC" \
-    LDFLAGS="-Wl,-s " \
-    AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
-
-make -j "$CPU_COUNT"
-make install
-cd ..
-
-# ----------------------------------------
-
-# MPC:
-
-mkdir -p bb10-libmpc-build
-cd bb10-libmpc-build
-
-../bb10-libmpc/configure \
-    --srcdir=../bb10-libmpc \
-    --build="$HOST_OS" \
-    --with-sysroot="$TARGET_FOLDER/qnx6/" \
-    --libdir="$PREFIX/lib" \
-    --libexecdir="$PREFIX/lib" \
-    --target="$TARGET_ABI" \
-    --prefix="$PREFIX" \
-    --exec-prefix="$PREFIX" \
-    --enable-shared \
-    CC="$HOST_CC" \
-    LDFLAGS="-Wl,-s " \
-    AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
-
-make -j "$CPU_COUNT"
-make install
-cd ..
-
-# ----------------------------------------
-
-# MPFR:
-
-mkdir -p bb10-libmpfr-build
-cd bb10-libmpfr-build
-
-../bb10-libmpfr/configure \
-    --srcdir=../bb10-libmpfr \
-    --build="$HOST_OS" \
-    --with-sysroot="$TARGET_FOLDER/qnx6/" \
-    --libdir="$PREFIX/lib" \
-    --libexecdir="$PREFIX/lib" \
-    --target="$TARGET_ABI" \
-    --prefix="$PREFIX" \
-    --exec-prefix="$PREFIX" \
-    --enable-shared \
-    CC="$HOST_CC" \
-    LDFLAGS="-Wl,-s " \
-    AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
-
-make -j "$CPU_COUNT"
-make install
-cd ..
 
 # ----------------------------------------
 
