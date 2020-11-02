@@ -16,16 +16,19 @@ export TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi" # default arm-unknown-nto-qnx8.
 export HOST_OS="$HOST_MACHINE-$HOST_PLATFORM-$HOST_KERNEL-gnu" # default: i686-pc-linux-gnu
 export PREFIX="$HOST_FOLDER/$HOST_KERNEL/$HOST_MACHINE/usr"
 
-#----------------------------------------
+# ----------------------------------------
 
 # ENVIRONMENT :
 source ~/bbndk/bbndk-env_10_3_1_995.sh
 export PATH="$PREFIX/bin:$PATH"
+export LIBDIR="$PREFIX/lib:$LIBDIR"
 
-#----------------------------------------
+# ----------------------------------------
 
 # PREPARATION :
 
+
+rm -rf "$OUTPUT_FOLDER"
 mkdir -p "$TARGET_FOLDER/qnx6/usr/"
 
 cp -R ~/bbndk/target_10_3_1_995/qnx6/usr/include/ "$TARGET_FOLDER/qnx6/usr/"
@@ -33,7 +36,7 @@ cp -R ~/bbndk/target_10_3_1_995/qnx6/usr/include/ "$TARGET_FOLDER/qnx6/usr/"
 mkdir -p BB10_tools
 cd BB10_tools
 
-#----------------------------------------
+# ----------------------------------------
 
 # DOWNLOAD
 
@@ -43,7 +46,7 @@ git clone https://github.com/extrowerk/bb10-libgmp.git
 git clone https://github.com/extrowerk/bb10-libmpfr.git
 git clone https://github.com/extrowerk/bb10-gcc.git
 
-#----------------------------------------
+# ----------------------------------------
 
 # GMP:
 
@@ -53,35 +56,12 @@ cd bb10-libgmp-build
 ../bb10-libgmp/configure \
     --srcdir=../bb10-libgmp \
     --build="$HOST_OS" \
-    --enable-cheaders=c \
-    --with-as="$TARGET_ABI"-as \
-    --with-ld="$TARGET_ABI"-ld \
     --with-sysroot="$TARGET_FOLDER/qnx6/" \
-    --disable-werror \
     --libdir="$PREFIX/lib" \
     --libexecdir="$PREFIX/lib" \
     --prefix="$PREFIX" \
     --exec-prefix="$PREFIX" \
-    --with-local-prefix="$PREFIX" \
-    --enable-languages=c++ \
-    --enable-threads=posix \
-    --disable-nls \
-    --disable-tls \
-    --disable-libssp \
-    --disable-libstdcxx-pch \
-    --enable-libmudflap \
-    --enable-libgomp \
-    --enable-__cxa_atexit \
-    --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/8.3.0" \
     --enable-shared \
-    --enable-multilib \
-    --with-bugurl=http://www.qnx.com \
-    --enable-gnu-indirect-function \
-    --enable-stack-protector \
-    --with-float=softfp \
-    --with-arch=armv7-a \
-    --with-fpu=vfpv3-d16 \
-    --with-mode=thumb \
     CC="$HOST_CC" \
     LDFLAGS="-Wl,-s " \
     AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
@@ -90,7 +70,7 @@ make -j "$CPU_COUNT"
 make install
 cd ..
 
-----------------------------------------
+# ----------------------------------------
 
 # MPC:
 
