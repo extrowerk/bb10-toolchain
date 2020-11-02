@@ -6,8 +6,8 @@
 
 HOST_CC="gcc"
 CPU_COUNT="4"
-TARGET_FOLDER="$TARGET_FOLDER"
-HOST_FOLDER="$HOST_FOLDER"
+TARGET_FOLDER="/opt/qnx800/target"
+HOST_FOLDER="/opt/qnx800/host"
 HOST_OS="i686-pc-linux-gnu"
 TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi"
 
