@@ -1,12 +1,11 @@
 #!/bin/bash
-set -e # Exit on first error
 
 # PERSONALIZATON :
 
 # You probably want to change this:
 
 export HOST_CC="gcc" # default: gcc
-export CPU_COUNT="1"
+export CPU_COUNT="4"
 export LANGS="c,c++" # default: c,c++ but fortran and go should also work
 
 # ----------------------------------------
@@ -39,7 +38,7 @@ export LIBDIR="$PREFIX/lib:$LIBDIR"
 rm -rf "$OUTPUT_FOLDER"
 mkdir -p "$TARGET_FOLDER/qnx6/usr/"
 
-cp -R ~/bbndk/target_10_3_1_995/qnx6/usr/include/ "$TARGET_FOLDER/qnx6/usr/"
+cp -R ~/bbndk/target_10_3_1_995/qnx6/usr/include/ "$TARGET_FOLDER/qnx6/usr/" && # Let's run it in the background
 
 mkdir -p BB10_tools
 cd BB10_tools
@@ -48,15 +47,15 @@ cd BB10_tools
 
 # DOWNLOADS :
 
-wget https://ftp.fau.de/gnu/binutils/binutils-2.35.tar.xz # this is just the vanilla binutils
-tar -xvf binutils-2.35.tar.xz
-mv binutils-2.35 bb10-binutils
+#wget https://ftp.fau.de/gnu/binutils/binutils-2.35.tar.xz # this is just the vanilla binutils
+#tar -xvf binutils-2.35.tar.xz
+#mv binutils-2.35 bb10-binutils
 
-# git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-binutils.git
-git clone --branch 0.2 --depth 1 https://github.com/extrowerk/bb10-gcc.git
-git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
-git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
-git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
+git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-binutils.git
+git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-gcc.git
+git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
+git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
+git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
 
 # ----------------------------------------
 
@@ -65,6 +64,10 @@ git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libmpfr.git b
 cd bb10-gcc/mpfr
 autoreconf -f -i # make sure you have autoconf-archive installed!
 cd ../..
+
+# ----------------------------------------
+
+set -e # Exit on first error
 
 # ----------------------------------------
 
@@ -104,15 +107,15 @@ export CFLAGS_FOR_BUILD="" # maybe unneeded
 export CFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
 export CXXFLAGS="" # maybe unneeded
 export CXXFLAGS_FOR_BUILD="" # maybe unneeded
-export CXXFLAGS_FOR_TARGET="-g -I/home/szilard/bbndk/target_10_3_1_995/qnx6/usr/include/cpp/c" # TODO: check why as bails out without this.
+export CXXFLAGS_FOR_TARGET="-g" # -I/home/szilard/bbndk/target_10_3_1_995/qnx6/usr/include/cpp/c TODO: check why as bails out without this.
 
 
 ../bb10-gcc/configure \
     --srcdir=../bb10-gcc \
     --build="$HOST_OS" \
     --enable-cheaders=c \
-    --with-as="$TARGET_ABI"-as \
-    --with-ld="$TARGET_ABI"-ld \
+    --with-as="$PREFIX/bin/$TARGET_ABI"-as \
+    --with-ld="$PREFIX/bin/$TARGET_ABI"-ld \
     --with-sysroot="$TARGET_FOLDER/qnx6/" \
     --disable-werror \
     --libdir="$PREFIX/lib" \
@@ -129,10 +132,10 @@ export CXXFLAGS_FOR_TARGET="-g -I/home/szilard/bbndk/target_10_3_1_995/qnx6/usr/
     --disable-libstdcxx-pch \
     --enable-libmudflap \
     --enable-__cxa_atexit \
-    --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/8.3.0" \
+    --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/5.4.0" \
     --enable-shared \
     --enable-multilib \
-    --with-bugurl="http://www.qnx.com" \
+    --with-bugurl="$BUGURL" \
     --enable-gnu-indirect-function \
     --enable-stack-protector \
     --with-float=softfp \
@@ -143,8 +146,8 @@ export CXXFLAGS_FOR_TARGET="-g -I/home/szilard/bbndk/target_10_3_1_995/qnx6/usr/
     LDFLAGS="-Wl,-s " \
     AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
  
-make all-gcc -j "$CPU_COUNT"
-make all-target-libgcc -j "$CPU_COUNT"
+#make all-gcc -j "$CPU_COUNT"
+#make all-target-libgcc -j "$CPU_COUNT"
 make all -j "$CPU_COUNT"
 #make install-gcc
 #make install-target-libgcc
