@@ -46,7 +46,7 @@ Consider passing -static too to remove the runtime dependency.
 
 Compiling an auto* package:
 ```
-CC=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc ./configure --target arm-unknown-nto-qnx8.0.0eabi
+CC=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc CPP=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-cpp ./configure --host=arm-unknown-nto-qnx8.0.0eabi --prefix=/some/where
 ```
 
 /-/
