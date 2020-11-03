@@ -6,7 +6,7 @@
 
 export HOST_CC="gcc" # default: gcc
 export CPU_COUNT="4"
-export LANGS="c,c++" # default: c,c++ but fortran and go should also work
+export LANGS="c,c++, fortran" # default: c,c++ but fortran should also work
 
 # ----------------------------------------
 
@@ -151,4 +151,7 @@ export CXXFLAGS_FOR_TARGET="-g" # -I/home/szilard/bbndk/target_10_3_1_995/qnx6/u
 make all -j "$CPU_COUNT"
 #make install-gcc
 #make install-target-libgcc
-make install
+make install-strip
+
+# We need to create a symlink: libstdc++.so > libc++.so
+# This is strange, do QNX cals it so?
