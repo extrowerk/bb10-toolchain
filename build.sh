@@ -50,11 +50,11 @@ wget https://ftp.fau.de/gnu/binutils/binutils-2.35.tar.xz # this is just the van
 tar -xvf binutils-2.35.tar.xz
 mv binutils-2.35 bb10-binutils
 
-# git clone https://github.com/extrowerk/bb10-binutils.git
-git clone https://github.com/extrowerk/bb10-gcc.git
-git clone https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
-git clone https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
-git clone https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
+# git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-binutils.git
+git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-gcc.git
+git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
+git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
+git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
 
 # ----------------------------------------
 
