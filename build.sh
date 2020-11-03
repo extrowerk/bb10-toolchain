@@ -1,11 +1,13 @@
 #!/bin/bash
+set -e # Exit on first error
 
 # PERSONALIZATON :
 
 # You probably want to change this:
 
 export HOST_CC="gcc" # default: gcc
-export CPU_COUNT="4"
+export CPU_COUNT="1"
+export LANGS="c,c++" # default: c,c++ but fortran and go should also work
 
 # ----------------------------------------
 
@@ -51,7 +53,7 @@ tar -xvf binutils-2.35.tar.xz
 mv binutils-2.35 bb10-binutils
 
 # git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-binutils.git
-git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-gcc.git
+git clone --branch 0.2 --depth 1 https://github.com/extrowerk/bb10-gcc.git
 git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
 git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
 git clone --branch 0.1 --depth 1 https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
@@ -102,7 +104,7 @@ export CFLAGS_FOR_BUILD="" # maybe unneeded
 export CFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
 export CXXFLAGS="" # maybe unneeded
 export CXXFLAGS_FOR_BUILD="" # maybe unneeded
-export CXXFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
+export CXXFLAGS_FOR_TARGET="-g -I/home/szilard/bbndk/target_10_3_1_995/qnx6/usr/include/cpp/c" # TODO: check why as bails out without this.
 
 
 ../bb10-gcc/configure \
@@ -119,7 +121,7 @@ export CXXFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
     --prefix="$PREFIX" \
     --exec-prefix="$PREFIX" \
     --with-local-prefix="$PREFIX" \
-    --enable-languages=c++ \
+    --enable-languages="$LANGS" \
     --enable-threads=posix \
     --disable-nls \
     --disable-tls \
@@ -143,5 +145,7 @@ export CXXFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
  
 make all-gcc -j "$CPU_COUNT"
 make all-target-libgcc -j "$CPU_COUNT"
-make install-gcc
-make install-target-libgcc
+make all -j "$CPU_COUNT"
+#make install-gcc
+#make install-target-libgcc
+make install
