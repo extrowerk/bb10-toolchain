@@ -48,6 +48,15 @@ Compiling an auto* package:
 ```
 CC=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc CPP=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-cpp ./configure --host=arm-unknown-nto-qnx8.0.0eabi --prefix=/some/where
 ```
+or
+```
+CC=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc CPP=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-cpp ./configure --target=arm-unknown-nto-qnx8.0.0eabi --prefix=/some/where
+```
+or
+```
+./configure  --prefix=/home/szilard/Asztal/00000/PORTS/ --cc=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc --cxx=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-g++ --enable-cross-compile
+```
+I wish i was joking. GNU was a mistake.
 
 /-/
 
