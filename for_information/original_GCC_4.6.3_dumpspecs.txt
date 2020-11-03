@@ -1,0 +1,142 @@
+*asm:
+%{EB:-EB} %{!EB:-EL} %{EL:-EL}  %{fpic|fPIC:--defsym __PIC__=1}  %{mcpu=*:-mcpu=%*}  %{march=*:-march=%*}  %{mfloat-abi=*} %{mfpu=*}  %{mapcs-float:-mfloat}  %{!mfloat-abi=*: -mfloat-abi=softfp}  %{!march=*: -march=armv7-a}  %{!mfpu=*: -mfpu=vfpv3-d16}  -meabi=5
+
+*asm_debug:
+%{!g0:%{gstabs*:--gstabs}%{!gstabs*:%{g*:--gdwarf2}}} %{fdebug-prefix-map=*:--debug-prefix-map %*}
+
+*asm_final:
+
+
+*asm_options:
+%{-target-help:%:print-asm-header()} %{v} %{w:-W} %{I*} %a %Y %{c:%W{o*}%{!o*:-o %w%b%O}}%{!c:-o %d%w%u%O}
+
+*invoke_as:
+%{!fwpa:   %{fcompare-debug=*|fdump-final-insns=*:%:compare-debug-dump-opt()}   %{!S:-o %|.s |
+ as %(asm_options) %m.s %A }  }
+
+*cpp:
+%(subtarget_cpp_spec)					%{msoft-float:%{mhard-float:							%e-msoft-float and -mhard_float may not be used together}}	%{mbig-endian:%{mlittle-endian:							%e-mbig-endian and -mlittle-endian may not be used together}}
+
+*cpp_options:
+%(cpp_unique_options) %1 %{m*} %{std*&ansi&trigraphs} %{W*&pedantic*} %{w} %{f*} %{g*:%{!g0:%{g*} %{!fno-working-directory:-fworking-directory}}} %{O*} %{undef} %{save-temps*:-fpch-preprocess} %(ssp_default)
+
+*cpp_debug_options:
+%{d*}
+
+*cpp_unique_options:
+%{!Q:-quiet} %{nostdinc*} %{C} %{CC} %{v} %{I*&F*} %{P} %I %{MD:-MD %{!o:%b.d}%{o*:%.d%*}} %{MMD:-MMD %{!o:%b.d}%{o*:%.d%*}} %{M} %{MM} %{MF*} %{MG} %{MP} %{MQ*} %{MT*} %{!E:%{!M:%{!MM:%{!MT:%{!MQ:%{MD|MMD:%{o*:-MQ %*}}}}}}} %{remap} %{g3|ggdb3|gstabs3|gcoff3|gxcoff3|gvms3:-dD} %{!iplugindir*:%{fplugin*:%:find-plugindir()}} %{H} %C %{D*&U*&A*} %{i*} %Z %i %{fmudflap:-D_MUDFLAP -include mf-runtime.h} %{fmudflapth:-D_MUDFLAP -D_MUDFLAPTH -include mf-runtime.h} %{E|M|MM:%W{o*}}
+
+*trad_capable_cpp:
+cc1 -E %{traditional|traditional-cpp:-traditional-cpp}
+
+*cc1:
+ %{EB:-mbig-endian} %{!EB:-mlittle-endian}
+
+*cc1_options:
+%{pg:%{fomit-frame-pointer:%e-pg and -fomit-frame-pointer are incompatible}} %{!iplugindir*:%{fplugin*:%:find-plugindir()}} %1 %{!Q:-quiet} %{!dumpbase:-dumpbase %B} %{d*} %{m*} %{aux-info*} %{fcompare-debug-second:%:compare-debug-auxbase-opt(%b)}  %{!fcompare-debug-second:%{c|S:%{o*:-auxbase-strip %*}%{!o*:-auxbase %b}}}%{!c:%{!S:-auxbase %b}}  %{g*} %{O*} %{W*&pedantic*} %{w} %{std*&ansi&trigraphs} %{v:-version} %{pg:-p} %{p} %{f*} %{undef} %{Qn:-fno-ident} %{Qy:} %{-help:--help} %{-target-help:--target-help} %{-version:--version} %{-help=*:--help=%*} %{!fsyntax-only:%{S:%W{o*}%{!o*:-o %b.s}}} %{fpic|fPIC|fpie|fPIE|fno-pic|fno-PIC|fno-pie|fno-PIE|static|shared|nostdlib|nostartfiles|D__KERNEL__:;:-fPIE} %{static:%{pie:%e-static and -pie are incompatible}} %{fsyntax-only:-o %j} %{-param*} %{fmudflap|fmudflapth:-fno-builtin -fno-merge-constants} %{coverage:-fprofile-arcs -ftest-coverage}
+
+*cc1plus:
+
+
+*link_gcc_c_sequence:
+%{static:--start-group} %G %L %{static:--end-group}%{!static:%G}
+
+*link_ssp:
+%{fstack-protector:}
+
+*ssp_default:
+%{!fno-stack-protector:%{!fstack-protector:%{!fstack-protector-all:%{!ffreestanding:%{!nostdlib:-fstack-protector-strong}}}}}
+
+*endfile:
+crtend.o%s %$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/lib/crtn.o
+
+*link:
+%{h*} %{v:-V}  %{b} %{Wl,*:%*}  %{!r:--build-id=md5}  %{static:-Bstatic}  %{shared}  %{symbolic:-Bsymbolic}  %{G:-G} %{MAP:-Map mapfile}  %{!shared:-dynamic-linker /usr/lib/ldqnx.so.2}  -m armnto -X --hash-style=gnu  %{EB:-EB} %{!EB:-EL} %{EL:-EL}
+
+*lib:
+-L %$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/lib/gcc/%v1.%v2.%v3  -L %$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/lib  -L %$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/usr/lib  -L %$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/opt/lib  -rpath-link %$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/lib/gcc/%v1.%v2.%v3:%$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/lib:%$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/usr/lib:%$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/opt/lib %{!symbolic: -lc -Bstatic %{static|nopie: -lc;:-lcS}}
+
+*mfwrap:
+ %{static: %{fmudflap|fmudflapth:  --wrap=malloc --wrap=free --wrap=calloc --wrap=realloc --wrap=mmap --wrap=munmap --wrap=alloca} %{fmudflapth: --wrap=pthread_create}} %{fmudflap|fmudflapth: --wrap=main}
+
+*mflib:
+ %{fmudflap: -export-dynamic -lmudflap -lsocket %{static:%(link_gcc_c_sequence) -lmudflap -lsocket -lbacktrace}}  %{fmudflapth: -export-dynamic -lmudflapth -lsocket %{static:%(link_gcc_c_sequence) -lmudflapth -lsocket -lbacktrace}} 
+
+*link_gomp:
+
+
+*libgcc:
+-lgcc
+
+*startfile:
+%{!shared: %$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/lib/%{pg:m}%{p:mcrt1.o;pie:crt1S.o%s;static|nopie:crt1.o%s;:crt1S.o%s} } %$QNX_TARGET/arm%{EB:be}%{!EB:le}-v7/lib/crti.o crtbegin.o%s 
+
+*cross_compile:
+1
+
+*version:
+4.6.3
+
+*multilib:
+. ;
+
+*multilib_defaults:
+marm mlittle-endian msoft-float mno-thumb-interwork fno-leading-underscore
+
+*multilib_extra:
+
+
+*multilib_matches:
+
+
+*multilib_exclusions:
+
+
+*multilib_options:
+
+
+*linker:
+collect2
+
+*linker_plugin_file:
+
+
+*lto_wrapper:
+
+
+*lto_gcc:
+
+
+*link_libgcc:
+%D
+
+*md_exec_prefix:
+
+
+*md_startfile_prefix:
+
+
+*md_startfile_prefix_1:
+
+
+*startfile_prefix_spec:
+
+
+*sysroot_spec:
+--sysroot=%R
+
+*sysroot_suffix_spec:
+
+
+*sysroot_hdrs_suffix_spec:
+
+
+*subtarget_cpp_spec:
+%{!nostdinc: -isystem %$QNX_HOST/usr/lib/gcc/arm-unknown-nto-qnx8.0.0eabi/%v1.%v2.%v3/include -isystem %$QNX_TARGET/usr/include/c++/%v1.%v2.%v3 -isystem %$QNX_TARGET/usr/include/c++/%v1.%v2.%v3/arm-unknown-nto-qnx8.0.0eabi -isystem %$QNX_TARGET/usr/include/c++/%v1.%v2.%v3/backward -isysroot %$QNX_TARGET/ } %(cpp_cpu)  %{!EB:-D__LITTLEENDIAN__ -D__ARMEL__}  %{EB:-D__BIGENDIAN__ -D__ARMEB__}  %{posix:-D_POSIX_SOURCE}
+
+*subtarget_asm_float_spec:
+ %{mapcs-float:-mfloat} %{!mhard-float:-mfpu=softvfp} %{mhard-float:-mfpu=vfp}
+
+*link_command:
+%{!fsyntax-only:%{!c:%{!M:%{!MM:%{!E:%{!S:    %(linker)     %{!fno-use-linker-plugin:%{flto|flto=*|fuse-linker-plugin:     -plugin %(linker_plugin_file)     -plugin-opt=%(lto_wrapper)     -plugin-opt=-fresolution=%u.res     %{!nostdlib:%{!nodefaultlibs:%:pass-through-libs(%(link_gcc_c_sequence))}}     }}     %{flto|flto=*:%<fcompare-debug*}     %{flto} %{flto=*} %l %{pie:-pie}  %{shared|Bshareable: %{!no-warn-shared-textrel:--warn-shared-textrel}}  %{static|Bstatic|shared|Bshareable|i|r|pie|nopie:;:-pie %{!no-warn-shared-textrel:--warn-shared-textrel}} %{fuse-ld=*:-fuse-ld=%*}    %X %{o*} %{e*} %{N} %{n} %{r}    %{s} %{t} %{u*} %{z} %{Z} %{!nostdlib:%{!nostartfiles:%S}}    %{static:} %{L*} %(mfwrap) %(link_libgcc) %o    %{fopenmp|ftree-parallelize-loops=*:%:include(libgomp.spec)%(link_gomp)}    %(mflib)  %{fsplit-stack: --wrap=pthread_create}    %{fprofile-arcs|fprofile-generate*|coverage:-lgcov}    %{!nostdlib:%{!nodefaultlibs:%(link_ssp) %(link_gcc_c_sequence)}}    %{!nostdlib:%{!nostartfiles:%E}} %{T*} }}}}}}
+

@@ -14,7 +14,7 @@ Tar will be also required.
 
 /-/
 
-How to use:
+How to build:
 
 1) open a Terminal
 2) ```sudo mkdir -p /opt/qnx800```
@@ -26,10 +26,35 @@ How to use:
 
 /-/
 
+How to use:
+
+Source the environment vars:
+```
+source ~/bbndk/bbndk-env_10_3_1_995.sh
+```
+
+Compiling a C program:
+```
+/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc test.c -o test
+```
+
+Compiling a C++ program:
+```
+/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-g++ hello.cpp -o hello_cpp -I/opt/qnx800/target/qnx6/usr/include/c++/5.4.0 -I/opt/qnx800/target/qnx6/usr/include/c++/5.4.0/arm-unknown-nto-qnx8.0.0eabi -L/opt/qnx800/host/linux/x86_64/usr/arm-unknown-nto-qnx8.0.0eabi/lib -static
+```
+Consider passing -static too to remove the runtime dependency.
+
+Compiling an auto* package:
+```
+CC=/opt/qnx800/host/linux/x86_64/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc ./configure --target arm-unknown-nto-qnx8.0.0eabi
+```
+
+/-/
+
 We can't update the runtime libs on the phone, but:
-- libgcc should be ok, it rarely changes
+- libgcc should be ok, it rarely changes (Checked, seems to be true)
 - you can also link your programs with -static-libgcc so they don't use libgcc_s.so.1 anyway
-- the C++ runtime library, libstdc++.so, is however a problem
+- the C++ runtime library, libstdc++.so, is however a problem (Checked, the compiled mini-program works on the phone)
 - link with -static-libstdc++ to not depend on libstdc++.so
 
 Consult the build.sh file for more information.

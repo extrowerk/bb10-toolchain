@@ -6,7 +6,7 @@
 
 export HOST_CC="gcc" # default: gcc
 export CPU_COUNT="4"
-export LANGS="c,c++, fortran" # default: c,c++ but fortran should also work
+export LANGS="c,c++" # default: c,c++ but fortran should also work
 
 # ----------------------------------------
 
@@ -107,7 +107,7 @@ export CFLAGS_FOR_BUILD="" # maybe unneeded
 export CFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
 export CXXFLAGS="" # maybe unneeded
 export CXXFLAGS_FOR_BUILD="" # maybe unneeded
-export CXXFLAGS_FOR_TARGET="-g" # -I/home/szilard/bbndk/target_10_3_1_995/qnx6/usr/include/cpp/c TODO: check why as bails out without this.
+export CXXFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
 
 
 ../bb10-gcc/configure \
@@ -145,13 +145,17 @@ export CXXFLAGS_FOR_TARGET="-g" # -I/home/szilard/bbndk/target_10_3_1_995/qnx6/u
     CC="$HOST_CC" \
     LDFLAGS="-Wl,-s " \
     AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
- 
-#make all-gcc -j "$CPU_COUNT"
-#make all-target-libgcc -j "$CPU_COUNT"
+
 make all -j "$CPU_COUNT"
-#make install-gcc
-#make install-target-libgcc
 make install-strip
 
-# We need to create a symlink: libstdc++.so > libc++.so
+# CLEANUP
+
+# We need to create a symlink: libstdc++.{a,so} > libc++.{a,so}
 # This is strange, do QNX cals it so?
+
+LIBDIR="$PREFIX/$TARGET_ABI/lib"
+ln -s $LIBDIR/libstdc++.so $LIBDIR/libc++.so
+ln -s $LIBDIR/libstdc++.a $LIBDIR/libc++.a
+
+echo "Have fun!"
