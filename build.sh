@@ -7,6 +7,8 @@
 export HOST_CC="gcc" # default: gcc
 export CPU_COUNT="4"
 export LANGS="c,c++" # default: c,c++ but fortran should also work
+export BRANCH="700_release" # or haiku
+export HELP_FOLDER="" # Default: empty, fill it if you want to put the output into an own folder.
 
 # ----------------------------------------
 
@@ -15,7 +17,7 @@ export LANGS="c,c++" # default: c,c++ but fortran should also work
 export HOST_KERNEL=`uname -s | tr '[:upper:]' '[:lower:]'` # should be lowercase, default: linux
 export HOST_PLATFORM=`uname -i`
 export HOST_MACHINE=`uname -m`
-export OUTPUT_FOLDER="/opt/qnx800" # default: /opt/qnx800
+export OUTPUT_FOLDER="$HELP_FOLDER/opt/qnx800" # default: /opt/qnx800
 export TARGET_FOLDER="$OUTPUT_FOLDER/target" # default: /opt/qnx800/target
 export HOST_FOLDER="$OUTPUT_FOLDER/host" # default: /opt/qnx800/host
 export TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi" # default: arm-unknown-nto-qnx8.0.0eabi
@@ -51,11 +53,11 @@ cd BB10_tools
 #tar -xvf binutils-2.35.tar.xz
 #mv binutils-2.35 bb10-binutils
 
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-binutils.git
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-gcc.git
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
+git clone --single-branch --branch $BRANCH --depth 1 https://github.com/extrowerk/bb10-binutils.git
+git clone --single-branch --branch $BRANCH --depth 1 https://github.com/extrowerk/bb10-gcc.git
+git clone --single-branch --branch $BRANCH --depth 1 https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
+git clone --single-branch --branch $BRANCH --depth 1 https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
+git clone --single-branch --branch $BRANCH --depth 1 https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
 
 # ----------------------------------------
 
