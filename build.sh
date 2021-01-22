@@ -20,7 +20,7 @@ export BUILD_DIR="/mnt/ramdisk"
 #export HOST_PLATFORM=`uname -i`
 #export HOST_KERNEL=`uname -s | tr '[:upper:]' '[:lower:]'` # should be lowercase, default: linux
 
-export HOST_MACHINE="x86"
+export HOST_MACHINE="x86" # this is what BB used
 export HOST_PLATFORM="pc"
 export HOST_KERNEL="linux"
 
@@ -38,9 +38,9 @@ export BUGURL="https://github.com/extrowerk/bb10-toolchain/"
 
 source ~/bbndk/bbndk-env_10_3_1_995.sh
 
-export CFLAGS="$CFLAGS -m32"
-export CXXFLAGS="$CXXFLAGS -m32" 
-export LDFLAGS="$LDFLAGS -m32"
+export CFLAGS="$CFLAGS -m32" # this will make a 32 bit executable
+export CXXFLAGS="$CXXFLAGS -m32" # if you want a 64 bit toolchain
+export LDFLAGS="$LDFLAGS -m32" # then remove them
 
 export PATH="$PREFIX/bin:$PATH"
 export LIBDIR="$PREFIX/lib:$LIBDIR"
