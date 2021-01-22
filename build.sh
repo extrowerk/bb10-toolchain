@@ -4,18 +4,27 @@
 
 # You probably want to change this:
 
-export HOST_CC="gcc" # default: gcc
+export HOST_CC="gcc-10" # default: gcc
+export HOST_CXX="g++-10" # default: gcc
 export CPU_COUNT="4"
 export LANGS="c,c++" # default: c,c++ but fortran should also work
+
+export SOURCES_DIR="/home/szilard/Asztal/BB10/bb10-toolchain/BB10_tools"
+export BUILD_DIR="/mnt/ramdisk"
 
 # ----------------------------------------
 
 # GLOBAL EXPORTS :
 
-export HOST_KERNEL=`uname -s | tr '[:upper:]' '[:lower:]'` # should be lowercase, default: linux
-export HOST_PLATFORM=`uname -i`
-export HOST_MACHINE=`uname -m`
-export OUTPUT_FOLDER="/opt/qnx800" # default: /opt/qnx800
+#export HOST_MACHINE=`uname -m`
+#export HOST_PLATFORM=`uname -i`
+#export HOST_KERNEL=`uname -s | tr '[:upper:]' '[:lower:]'` # should be lowercase, default: linux
+
+export HOST_MACHINE="x86"
+export HOST_PLATFORM="pc"
+export HOST_KERNEL="linux"
+
+export OUTPUT_FOLDER="/home/szilard/Asztal/opt/qnx800" # default: /opt/qnx800
 export TARGET_FOLDER="$OUTPUT_FOLDER/target" # default: /opt/qnx800/target
 export HOST_FOLDER="$OUTPUT_FOLDER/host" # default: /opt/qnx800/host
 export TARGET_ABI="arm-unknown-nto-qnx8.0.0eabi" # default: arm-unknown-nto-qnx8.0.0eabi
@@ -40,22 +49,26 @@ mkdir -p "$TARGET_FOLDER/qnx6/usr/"
 
 cp -R ~/bbndk/target_10_3_1_995/qnx6/usr/include/ "$TARGET_FOLDER/qnx6/usr/" && # Let's run it in the background
 
-mkdir -p BB10_tools
-cd BB10_tools
+mkdir -p $SOURCES_DIR
+cd $SOURCES_DIR
 
 # ----------------------------------------
 
 # DOWNLOADS :
 
-#wget https://ftp.fau.de/gnu/binutils/binutils-2.35.tar.xz # this is just the vanilla binutils
-#tar -xvf binutils-2.35.tar.xz
-#mv binutils-2.35 bb10-binutils
+git clone --depth 1 https://github.com/extrowerk/bb10-binutils.git
+git clone --depth 1 https://github.com/extrowerk/bb10-gcc.git
+git clone --depth 1 https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
+git clone --depth 1 https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
+git clone --depth 1 https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
 
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-binutils.git
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-gcc.git
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-libmpc.git bb10-gcc/mpc
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-libgmp.git bb10-gcc/gmp
-git clone --single-branch --branch 700_release --depth 1 https://github.com/extrowerk/bb10-libmpfr.git bb10-gcc/mpfr
+
+ISL=isl-0.23.tar.xz
+if [ ! -e "$ISL" ]; then
+	wget http://isl.gforge.inria.fr/isl-0.23.tar.xz
+	tar -xvf isl-0.23.tar.xz
+	mv ./isl-0.23 ./bb10-gcc/isl
+fi
 
 # ----------------------------------------
 
@@ -73,23 +86,24 @@ set -e # Exit on first error
 
 # BINUTILS :
 
-mkdir -p bb10-binutils-build
-cd bb10-binutils-build
+mkdir -p $BUILD_DIR/bb10-binutils-build
+cd $BUILD_DIR/bb10-binutils-build
 
-../bb10-binutils/configure \
-    --srcdir=../bb10-binutils \
-    --build="$HOST_OS" \
-    --with-sysroot="$TARGET_FOLDER/qnx6/" \
-    --disable-werror \
-    --libdir="$PREFIX/lib" \
-    --libexecdir="$PREFIX/lib" \
-    --target="$TARGET_ABI" \
-    --prefix="$PREFIX" \
-    --exec-prefix="$PREFIX" \
-    --with-local-prefix="$PREFIX" \
-    CC="$HOST_CC" \
-    LDFLAGS="-Wl,-s " \
-    AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
+$SOURCES_DIR/bb10-binutils/configure \
+	--srcdir=$SOURCES_DIR/bb10-binutils \
+	--build="$HOST_OS" \
+	--with-sysroot="$TARGET_FOLDER/qnx6/" \
+	--disable-werror \
+	--libdir="$PREFIX/lib" \
+	--libexecdir="$PREFIX/lib" \
+	--target="$TARGET_ABI" \
+	--prefix="$PREFIX" \
+	--exec-prefix="$PREFIX" \
+	--with-local-prefix="$PREFIX" \
+	CC="$HOST_CC" \
+	CC="$HOST_CXX" \
+	LDFLAGS="-Wl,-s " \
+	AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
 
 make -j "$CPU_COUNT"
 make install
@@ -99,52 +113,44 @@ cd ..
 
 # GCC :
 
-mkdir -p bb10-gcc-build
-cd bb10-gcc-build
+mkdir -p $BUILD_DIR/bb10-gcc-build
+cd $BUILD_DIR/bb10-gcc-build
 
-export CFLAGS="" # maybe unneeded
-export CFLAGS_FOR_BUILD="" # maybe unneeded
-export CFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
-export CXXFLAGS="" # maybe unneeded
-export CXXFLAGS_FOR_BUILD="" # maybe unneeded
-export CXXFLAGS_FOR_TARGET="-g" # TODO: check why as bails out without this.
-
-
-../bb10-gcc/configure \
-    --srcdir=../bb10-gcc \
-    --build="$HOST_OS" \
-    --enable-cheaders=c \
-    --with-as="$PREFIX/bin/$TARGET_ABI"-as \
-    --with-ld="$PREFIX/bin/$TARGET_ABI"-ld \
-    --with-sysroot="$TARGET_FOLDER/qnx6/" \
-    --disable-werror \
-    --libdir="$PREFIX/lib" \
-    --libexecdir="$PREFIX/lib" \
-    --target="$TARGET_ABI" \
-    --prefix="$PREFIX" \
-    --exec-prefix="$PREFIX" \
-    --with-local-prefix="$PREFIX" \
-    --enable-languages="$LANGS" \
-    --enable-threads=posix \
-    --disable-nls \
-    --disable-tls \
-    --disable-libssp \
-    --disable-libstdcxx-pch \
-    --enable-libmudflap \
-    --enable-__cxa_atexit \
-    --with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/5.4.0" \
-    --enable-shared \
-    --enable-multilib \
-    --with-bugurl="$BUGURL" \
-    --enable-gnu-indirect-function \
-    --enable-stack-protector \
-    --with-float=softfp \
-    --with-arch=armv7-a \
-    --with-fpu=vfpv3-d16 \
-    --with-mode=thumb \
-    CC="$HOST_CC" \
-    LDFLAGS="-Wl,-s " \
-    AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
+$SOURCES_DIR/bb10-gcc/configure \
+	--srcdir=$SOURCES_DIR/bb10-gcc \
+	--build="$HOST_OS" \
+	--enable-gnu-indirect-function=yes \
+	--enable-cxx-flags=-stdlib=libstdc++ \
+	--enable-cheaders=c_global \
+	--enable-initfini-array \
+	--enable-default-pie \
+	--with-as="$PREFIX/bin/$TARGET_ABI"-as \
+	--with-ld="$PREFIX/bin/$TARGET_ABI"-ld \
+	--with-float=softfp \
+	--with-arch=armv7-a \
+	--with-fpu=vfpv3-d16 \
+	--with-mode=thumb \
+	--prefix="$PREFIX" \
+	--libexecdir="$PREFIX/lib" \
+	--with-gxx-include-dir="$TARGET_FOLDER/qnx6/usr/include/c++/8.3.0" \
+	--enable-threads=posix \
+	--enable-__cxa_atexit \
+	--enable-languages="$LANGS" \
+	--with-sysroot="$TARGET_FOLDER/qnx6/" \
+	--target="$TARGET_ABI" \
+	--disable-nls \
+	--disable-tls \
+	--disable-libssp \
+	--disable-libstdcxx-pch \
+	--enable-libgomp \
+	--enable-shared \
+	--with-bugurl="$BUGURL" \
+	--enable-default-ssp \
+	--with-specs=%{!shared-libgcc:-static-libgcc} \
+	CC="$HOST_CC" \
+	CC="$HOST_CXX" \
+	LDFLAGS='-Wl,-s ' \
+	AUTOMAKE=: AUTOCONF=: AUTOHEADER=: AUTORECONF=: ACLOCAL=:
 
 make all -j "$CPU_COUNT"
 make install-strip
@@ -159,3 +165,4 @@ ln -s $LIBDIR/libstdc++.so $LIBDIR/libc++.so
 ln -s $LIBDIR/libstdc++.a $LIBDIR/libc++.a
 
 echo "Have fun!"
+
