@@ -4,8 +4,8 @@
 
 # You probably want to change this:
 
-export HOST_CC="gcc-10" # default: gcc
-export HOST_CXX="g++-10" # default: gcc
+export HOST_CC="i686-linux-gnu-gcc-8" # default: gcc
+export HOST_CXX="i686-linux-gnu-gcc-8" # default: gcc
 export CPU_COUNT="4"
 export LANGS="c,c++" # default: c,c++ but fortran should also work
 
@@ -37,6 +37,11 @@ export BUGURL="https://github.com/extrowerk/bb10-toolchain/"
 # ENVIRONMENT :
 
 source ~/bbndk/bbndk-env_10_3_1_995.sh
+
+export CFLAGS="$CFLAGS -m32"
+export CXXFLAGS="$CXXFLAGS -m32" 
+export LDFLAGS="$LDFLAGS -m32"
+
 export PATH="$PREFIX/bin:$PATH"
 export LIBDIR="$PREFIX/lib:$LIBDIR"
 
