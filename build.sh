@@ -5,7 +5,7 @@
 # You probably want to change this:
 
 export HOST_CC="i686-linux-gnu-gcc-8" # default: gcc
-export HOST_CXX="i686-linux-gnu-gcc-8" # default: gcc
+export HOST_CXX="i686-linux-gnu-g++-8" # default: g++
 export CPU_COUNT="4"
 export LANGS="c,c++" # default: c,c++ but fortran should also work
 
