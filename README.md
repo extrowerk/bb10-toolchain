@@ -2,6 +2,9 @@
 
 ![Proof](https://raw.githubusercontent.com/extrowerk/bb10-toolchain/master/2020-11-02-210811_861x137_scrot.png)
 
+WARNING!! SUPERSEEDED BY https://didacticode.ca/blog/development-tools-for-blackberry-10/
+
+
 /-/
 
 You will need the lates BB NDK:
